@@ -1,6 +1,6 @@
 import numpy as np
 from matplotlib import pyplot as plt
-from harris_toy import harris_toy as HT
+from harris_toy import main as HT
 from sklearn import linear_model, datasets
 from skimage.measure import ransac
 from skimage.feature import plot_matches
@@ -17,12 +17,6 @@ for i in range(N):
         index = random.randint(0, coord.shape[0] - 1)
         xx = np.insert(xx, i, coord[index][1])
         yy = np.insert(yy, i, coord[index][0])
-    # print(test)
-    # xx = test[:, 1]
-    # yy = test[:, 0]
-
-    xx = xx[~np.isnan(xx)]
-    yy = yy[~np.isnan(yy)]
 
     y = yy.tolist()
     y = np.asarray(y)

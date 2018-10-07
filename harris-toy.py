@@ -4,6 +4,7 @@ from skimage import data
 from skimage.feature import corner_harris, corner_subpix, corner_peaks
 from skimage.transform import warp, AffineTransform
 from skimage.draw import ellipse
+import numpy as np
 
 image=np.load('cube.npy')
 

@@ -10,18 +10,14 @@ import random
 coord, image = HT()
 N = 5
 count = int(coord.shape[0]/N)
-xx = np.empty(count)
-yy = np.empty(count)
+X = np.empty(count)
+y = np.empty(count)
 for i in range(N):
     for i in range(0, count):
         index = random.randint(0, coord.shape[0] - 1)
-        xx = np.insert(xx, i, coord[index][1])
-        yy = np.insert(yy, i, coord[index][0])
-
-    y = yy.tolist()
-    y = np.asarray(y)
-    X = xx.reshape(-1, 1)
-
+        X = np.insert(X, i, coord[index][1])
+        y = np.insert(y, i, coord[index][0])
+    X = X.reshape(-1, 1)
     plt.plot(X, y, '.')
     # Robustly fit linear model with RANSAC algorithm
     model_ransac = linear_model.RANSACRegressor(linear_model.LinearRegression())

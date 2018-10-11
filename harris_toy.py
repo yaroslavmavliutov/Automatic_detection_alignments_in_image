@@ -43,9 +43,7 @@ def point_intere(image_name):
     coords = corner_peaks(c_h, min_distance=1)
 
     coords_subpix = corner_subpix(image, coords, window_size=10)
-
     return del_dubl(my_round(coords_subpix))
-
 
 
 def main():
@@ -53,11 +51,9 @@ def main():
     c_h = corner_harris(image)
 
     cc = point_intere('cube.npy')
-    print(cc)
-    fig, ax = plt.subplots()
-    ax.imshow(c_h, interpolation='nearest', cmap=plt.cm.gray)
-    ax.plot(cc[:, 1], cc[:, 0], '.b', markersize=8)
-
+    #fig, ax = plt.subplots()
+    #ax.imshow(c_h, interpolation='nearest', cmap=plt.cm.gray)
+    #ax.plot(cc[:, 1], cc[:, 0], '.b', markersize=8)
     # ax.axis((0, 350, 350, 0))
     #plt.show()
     return cc, image

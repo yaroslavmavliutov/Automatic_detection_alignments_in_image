@@ -1,53 +1,38 @@
 import numpy as np
-from matplotlib import pyplot as plt
 from harris_toy import main as HT
-from sklearn import linear_model, datasets
-from skimage.measure import ransac
-from skimage.feature import plot_matches
-import random
+from matplotlib import pyplot as plt
 
-#1, 0
-coord, image = HT()
-N = 5
-count = int(coord.shape[0]/N)
-X = np.empty(count)
-y = np.empty(count)
-for i in range(N):
-    for i in range(0, count):
-        index = random.randint(0, coord.shape[0] - 1)
-        X = np.insert(X, i, coord[index][1])
-        y = np.insert(y, i, coord[index][0])
-    X = X.reshape(-1, 1)
-    plt.plot(X, y, '.')
-    # Robustly fit linear model with RANSAC algorithm
-    model_ransac = linear_model.RANSACRegressor(linear_model.LinearRegression())
-    model_ransac.fit(X, y)
-    inlier_mask = model_ransac.inlier_mask_
-    outlier_mask = np.logical_not(inlier_mask)
+def least_squares(xy1, xy2):
+    """
+    xy = [x, y]
+    y = mx + c
+    """
+    try:
+        m = (xy2[1] - xy1[1])/(xy2[0] - xy1[0])
+        c = (xy1[1]*xy1[0] - xy1[0]*xy2[1])/(xy2[0] - xy1[0]) + xy1[1]
+        return [m, c]
+    except: return [0, 0]
 
-    # Predict data of estimated models
-    line_X = np.arange(0, 300)
-    line_y_ransac = model_ransac.predict(line_X[:, np.newaxis])
+def evaluate_model(X, y, m_c, inlier_threshold):
+
+    count = 0
+    for i in range(0, len(X)):
+        if (y[i] - m_c[0]*X[i] + m_c[1]) <= inlier_threshold:
+            count = count + 1
+    return count
 
 
-    plt.plot(X[inlier_mask], y[inlier_mask], '.g')
-    plt.plot(X[outlier_mask], y[outlier_mask], '.r')
-    plt.plot(line_X, line_y_ransac, '-b')
-    plt.imshow(image, interpolation='nearest', cmap=plt.cm.gray)
-    plt.legend(loc='lower right')
-plt.show()
-
-
-def ransac(X, y, fit_fn, evaluate_fn, max_iters=100, samples_to_fit=2, inlier_threshold=0.1, min_inliers=10):
+def ransac(X, y, max_iters=1000, inlier_threshold=5, min_inliers=50):
     best_model = None
     best_model_performance = 0
-
-    num_samples = X.shape[0]
+    #min_inliers = X.shape[0] - 1
+    index = X.shape[0]
 
     for i in range(max_iters):
-        sample = np.random.choice(num_samples, size=samples_to_fit, replace=False)
-        model_params = fit_fn(X[sample], y[sample])
-        model_performance = evaluate_fn(X, y, model_params, inlier_threshold)
+        sample = np.random.choice(index, size=2, replace=False)
+        model_params = least_squares([X[sample[0]], y[sample[0]]], [X[sample[1]], y[sample[1]]])
+
+        model_performance = evaluate_model(X, y, model_params, inlier_threshold)
 
         if model_performance < min_inliers:
             continue
@@ -57,3 +42,26 @@ def ransac(X, y, fit_fn, evaluate_fn, max_iters=100, samples_to_fit=2, inlier_th
             best_model_performance = model_performance
 
     return best_model
+
+xys, image = HT()
+
+
+# точки на графік
+#plt.scatter(xys.T[0], xys.T[1])
+
+
+# наша ф-я
+model = ransac(np.asarray(xys[:, 1]), np.asarray(xys[:, 0]))
+
+
+
+y = []
+x = []
+for i in range(0, 300):
+    if abs(i*model[0] + model[1])<= np.amax(np.asarray(xys[:, 0])):
+        y.append(i*model[0] + model[1])
+        x.append(i)
+plt.plot(x, y, color=(0, 1, 0))
+
+plt.imshow(image, interpolation='nearest', cmap=plt.cm.gray)
+plt.show()

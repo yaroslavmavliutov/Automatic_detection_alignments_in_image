@@ -51,9 +51,9 @@ def main():
     c_h = corner_harris(image)
 
     cc = point_intere('cube.npy')
-    #fig, ax = plt.subplots()
+    fig, ax = plt.subplots()
     #ax.imshow(c_h, interpolation='nearest', cmap=plt.cm.gray)
-    #ax.plot(cc[:, 1], cc[:, 0], '.b', markersize=8)
+    ax.plot(cc[:, 1], cc[:, 0], '.b', markersize=8)
     # ax.axis((0, 350, 350, 0))
     #plt.show()
     return cc, image

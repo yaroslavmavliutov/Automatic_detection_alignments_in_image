@@ -1,8 +1,5 @@
 from matplotlib import pyplot as plt
-from skimage import data
 from skimage.feature import corner_harris, corner_subpix, corner_peaks
-from skimage.transform import warp, AffineTransform
-from skimage.draw import ellipse
 import numpy as np
 from decimal import Decimal, ROUND_HALF_UP
 
@@ -37,25 +34,33 @@ def del_dubl(x):
 
 def point_intere(image_name):
 
-    image=np.load(image_name)
-    c_h = corner_harris(image)
+    image = np.load(image_name)
+    c_h = corner_harris(image, k = 0.06)
 
-    coords = corner_peaks(c_h, min_distance=1)
+    coords = corner_peaks(c_h, min_distance=2)
+    coords_subpix = corner_subpix(image, coords, window_size=11)
 
-    coords_subpix = corner_subpix(image, coords, window_size=10)
     return del_dubl(my_round(coords_subpix))
 
 
 def main():
-    image=np.load('cube.npy')
-    c_h = corner_harris(image)
+    # image=np.load('./Data/toy-data-ransac.npy')
+    image = np.load('./Data/cube.npy')
+    # c_h = corner_harris(image)
 
-    cc = point_intere('cube.npy')
+    cc = point_intere('./Data/cube.npy')
     fig, ax = plt.subplots()
-    #ax.imshow(c_h, interpolation='nearest', cmap=plt.cm.gray)
+    # ax.imshow(c_h, interpolation='nearest', cmap=plt.cm.gray)
     ax.plot(cc[:, 1], cc[:, 0], '.b', markersize=8)
-    # ax.axis((0, 350, 350, 0))
-    #plt.show()
     return cc, image
-
-
+#
+# # image=np.load('./Data/toy-data-ransac.npy')
+# image = np.load('./Data/cube.npy')
+# c_h = corner_harris(image)
+#
+# cc = point_intere('./Data/cube.npy')
+# fig, ax = plt.subplots()
+# ax.imshow(c_h, interpolation='nearest', cmap=plt.cm.gray)
+# ax.plot(cc[:, 1], cc[:, 0], '.b', markersize=8)
+#
+# plt.show()

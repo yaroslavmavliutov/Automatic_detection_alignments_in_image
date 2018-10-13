@@ -62,33 +62,34 @@ def main():
 
     # data, image = HT()
     data = np.load('Data/toy-data-ransac.npy')
-
+    print(len(data))
     # plot points
     plt.scatter(data.T[0], data.T[1])
+    
+    for i in range(0, int(math.log(len(data) - 1))):
+        # our RANSAC
+        model = ransac(np.asarray(data[:, 1]), np.asarray(data[:, 0]), max_iterations, inlier_threshold, min_inliers)
 
-    # our RANSAC
-    model = ransac(np.asarray(data[:, 1]), np.asarray(data[:, 0]), max_iterations, inlier_threshold, min_inliers)
-
-    # min X and max X for curve
-    xx = []
-    for i in range(0, len(data) - 1):
-        distance = abs(model[0] * data[:, 1][i] - data[:, 0][i] + model[1]) / math.sqrt(model[0] ** 2 + 1)
-        # print('x ', X[i])
-        # print('y ', y[i])
-        # print('m_c ', m_c)
-        # print('d ', distance)
-        if distance <= 15:
-            xx.append(data[:, 1][i])
+        # min X and max X for curve
+        xx = []
+        for i in range(0, len(data) - 1):
+            distance = abs(model[0] * data[:, 1][i] - data[:, 0][i] + model[1]) / math.sqrt(model[0] ** 2 + 1)
+            # print('x ', X[i])
+            # print('y ', y[i])
+            # print('m_c ', m_c)
+            # print('d ', distance)
+            if distance <= 15:
+                xx.append(data[:, 1][i])
 
 
-    y = []
-    x = []
-    # for i in range(np.amin(np.asarray(xys[:, 1])), np.amax(np.asarray(xys[:, 1]))):
-    for i in range(min(xx), max(xx)):
-        if abs(i*model[0] + model[1])<= np.amax(np.asarray(xys[:, 0])):
-            y.append(i*model[0] + model[1])
-            x.append(i)
-    plt.plot(x, y, color=(0, 1, 0))
+        y = []
+        x = []
+        # for i in range(np.amin(np.asarray(xys[:, 1])), np.amax(np.asarray(xys[:, 1]))):
+        for i in range(min(xx), max(xx)):
+            if abs(i*model[0] + model[1])<= np.amax(np.asarray(data[:, 0])):
+                y.append(i*model[0] + model[1])
+                x.append(i)
+        plt.plot(x, y, color=(0, 1, 0))
 
     #plt.imshow(image, interpolation='nearest', cmap=plt.cm.gray)
     plt.show()

@@ -18,14 +18,14 @@ def least_squares(xy1, xy2):
 
 def evaluate_model(X, y, k_b, inlier_threshold):
     count = 0
+    #points_in_line = []
+
     for i in range(0, len(X) - 1):
         distance = abs(k_b[0]*X[i] - y[i] + k_b[1])/math.sqrt(k_b[0]**2 + 1)
-        # print('x ', X[i])
-        # print('y ', y[i])
-        # print('m_c ', m_c)
-        # print('d ', distance)
         if distance <= inlier_threshold:
             count = count + 1
+            #points_in_line.append((y[i], X[i]))
+    # return count, points_in_line
     return count
 
 
@@ -34,13 +34,14 @@ def ransac(X, y, max_iters, inlier_threshold, min_inliers):
     best_model_performance = 0
     index = X.shape[0]
 
+    # points_in_line = []
+
     for i in range(max_iters):
         sample = np.random.choice(index, size=2, replace=False)
         model_params = least_squares([X[sample[0]], y[sample[0]]], [X[sample[1]], y[sample[1]]])
-        #print('iteration: ', i)
-        #print('koeff: ', model_params)
+
         model_performance = evaluate_model(X, y, model_params, inlier_threshold)
-        #print('count in_point: ', model_performance)
+
         if model_performance < min_inliers:
             continue
 
@@ -48,50 +49,62 @@ def ransac(X, y, max_iters, inlier_threshold, min_inliers):
             best_model = model_params
             best_model_performance = model_performance
 
-        #print('BEST: ', best_model)
-        #print('-------')
+    # return best_model, points_in_line
     return best_model
 
+
+
 def main():
-    max_iterations = 1000
-    inlier_threshold = 15
-    min_inliers = 30
+    max_iterations = 100
+    inlier_threshold = 1
+    min_inliers = 8
     """
      data = [x, y]
     """
 
-    # data, image = HT()
-    data = np.load('Data/toy-data-ransac.npy')
-    print(len(data))
+    data, image = HT()
+
+    #data = np.load('Data/toy-data-ransac.npy')
+
     # plot points
-    plt.scatter(data.T[0], data.T[1])
-    
-    for i in range(0, int(math.log(len(data) - 1))):
+    #plt.scatter(data.T[0], data.T[1])
+
+    lines = []
+
+    i = 0
+    while i < int(math.log(len(data))):
         # our RANSAC
-        model = ransac(np.asarray(data[:, 1]), np.asarray(data[:, 0]), max_iterations, inlier_threshold, min_inliers)
+        model = ransac(np.asarray(data[:, 1]), np.asarray(data[:, 0]), max_iterations, inlier_threshold,
+                                 min_inliers)
 
-        # min X and max X for curve
         xx = []
-        for i in range(0, len(data) - 1):
-            distance = abs(model[0] * data[:, 1][i] - data[:, 0][i] + model[1]) / math.sqrt(model[0] ** 2 + 1)
-            # print('x ', X[i])
-            # print('y ', y[i])
-            # print('m_c ', m_c)
-            # print('d ', distance)
-            if distance <= 15:
-                xx.append(data[:, 1][i])
+        for k in range(0, len(data) - 1):
+            distance = abs(model[0] * data[:, 1][k] - data[:, 0][k] + model[1]) / math.sqrt(model[0] ** 2 + 1)
+            if distance <= inlier_threshold:
+                xx.append(data[:, 1][k])
 
+        my_detect = 0
+        if i >= 1:
+            for line in lines:
+                if len(set(line) & set(xx)) >= 2:
+                    my_detect += 1
+            if my_detect > 0:
+                continue
+            else:
+                lines.append(xx)
+        else:
+            lines.append(xx)
 
         y = []
         x = []
-        # for i in range(np.amin(np.asarray(xys[:, 1])), np.amax(np.asarray(xys[:, 1]))):
-        for i in range(min(xx), max(xx)):
-            if abs(i*model[0] + model[1])<= np.amax(np.asarray(data[:, 0])):
-                y.append(i*model[0] + model[1])
-                x.append(i)
+        for j in range(min(xx), max(xx)):
+                y.append(j*model[0] + model[1])
+                x.append(j)
         plt.plot(x, y, color=(0, 1, 0))
+        i += 1
+        print(lines)
 
-    #plt.imshow(image, interpolation='nearest', cmap=plt.cm.gray)
+    plt.imshow(image, interpolation='nearest', cmap=plt.cm.gray)
     plt.show()
 
 

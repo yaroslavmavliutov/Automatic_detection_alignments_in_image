@@ -2,7 +2,7 @@ from matplotlib import pyplot as plt
 from skimage.feature import corner_harris, corner_subpix, corner_peaks
 import numpy as np
 from decimal import Decimal, ROUND_HALF_UP
-
+from PIL import Image
 
 
 def del_nan(x):
@@ -34,13 +34,14 @@ def del_dubl(x):
 
 def point_intere(image_name):
 
-    image = np.load(image_name)
+    # image = np.load(image_name)
+    image = image_name
     c_h = corner_harris(image, k = 0.06)
 
     coords = corner_peaks(c_h, min_distance=2)
-    coords_subpix = corner_subpix(image, coords, window_size=11)
+    # coords_subpix = corner_subpix(image, coords, window_size=11)
 
-    return del_dubl(my_round(coords_subpix))
+    return del_dubl(my_round(coords))
 
 
 def main():
@@ -53,12 +54,16 @@ def main():
     # ax.imshow(c_h, interpolation='nearest', cmap=plt.cm.gray)
     ax.plot(cc[:, 1], cc[:, 0], '.b', markersize=8)
     return cc, image
-#
+
 # # image=np.load('./Data/toy-data-ransac.npy')
-# image = np.load('./Data/cube.npy')
+# image = np.load('./Data/im_2.npy')
+# # image = np.asarray(Image.open('./Data/1g.jpg'))
+# plt.imshow(image, interpolation='nearest', cmap=plt.cm.gray)
+# plt.show()
 # c_h = corner_harris(image)
 #
-# cc = point_intere('./Data/cube.npy')
+# cc = point_intere(image)
+# print(cc)
 # fig, ax = plt.subplots()
 # ax.imshow(c_h, interpolation='nearest', cmap=plt.cm.gray)
 # ax.plot(cc[:, 1], cc[:, 0], '.b', markersize=8)

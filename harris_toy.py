@@ -46,26 +46,11 @@ def point_intere(image_name):
 
 def main():
     # image=np.load('./Data/toy-data-ransac.npy')
-    image = np.load('./Data/cube.npy')
+    image = np.load('./Data/im_2.npy')
     # c_h = corner_harris(image)
 
-    cc = point_intere('./Data/cube.npy')
+    cc = point_intere('./Data/im_2.npy')
     fig, ax = plt.subplots()
     # ax.imshow(c_h, interpolation='nearest', cmap=plt.cm.gray)
     ax.plot(cc[:, 1], cc[:, 0], '.b', markersize=8)
     return cc, image
-
-# # image=np.load('./Data/toy-data-ransac.npy')
-# image = np.load('./Data/im_2.npy')
-# # image = np.asarray(Image.open('./Data/1g.jpg'))
-# plt.imshow(image, interpolation='nearest', cmap=plt.cm.gray)
-# plt.show()
-# c_h = corner_harris(image)
-#
-# cc = point_intere(image)
-# print(cc)
-# fig, ax = plt.subplots()
-# ax.imshow(c_h, interpolation='nearest', cmap=plt.cm.gray)
-# ax.plot(cc[:, 1], cc[:, 0], '.b', markersize=8)
-#
-# plt.show()

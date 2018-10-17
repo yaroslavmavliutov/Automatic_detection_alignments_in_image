@@ -4,7 +4,6 @@ import numpy as np
 from decimal import Decimal, ROUND_HALF_UP
 from PIL import Image
 
-
 def del_nan(x):
     x_new = []
     for i in range(len(x)):
@@ -12,8 +11,6 @@ def del_nan(x):
             x_new.append(x[i])
 
     return x_new
-
-
 
 def my_round(x):
     x = del_nan(x)
@@ -30,12 +27,10 @@ def del_dubl(x):
     tmp = set(x)
     return np.array(list(tmp))
 
-
-
 def point_intere(image_name):
 
-    # image = np.load(image_name)
-    image = image_name
+    image = np.load(image_name)
+    #image = image_name
     c_h = corner_harris(image, k = 0.06)
 
     coords = corner_peaks(c_h, min_distance=2)
@@ -44,13 +39,12 @@ def point_intere(image_name):
     return del_dubl(my_round(coords))
 
 
-def main():
-    # image=np.load('./Data/toy-data-ransac.npy')
-    image = np.load('./Data/im_2.npy')
+def main(name_file):
+    image = np.load(name_file)
     # c_h = corner_harris(image)
 
-    cc = point_intere('./Data/im_2.npy')
+    cc = point_intere(name_file)
     fig, ax = plt.subplots()
     # ax.imshow(c_h, interpolation='nearest', cmap=plt.cm.gray)
-    ax.plot(cc[:, 1], cc[:, 0], '.b', markersize=8)
+    ax.plot(cc[:, 1], cc[:, 0], '.b', markersize=3)
     return cc, image
